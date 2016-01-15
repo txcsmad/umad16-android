@@ -29,8 +29,6 @@ public class MainActivity extends ActionBarActivity{
     public static int screenHeight;
     public static int screenDensity;
     public Toolbar toolbar;
-    public static ArrayList<EventInfo> eventInfoListCache;
-    public static ArrayList<CompanyInfo> companiesCache = new ArrayList<CompanyInfo>();
 
 
     @Override

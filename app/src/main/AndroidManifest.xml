@@ -43,14 +43,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
-        <activity
-            android:name=".activities.SponsorWebviewActivity"
-            android:label="@string/app_name"
-            android:parentActivityName=".activities.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
-        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="42c2a8bebb5aae94883c4014c65157a9fa006afa" />

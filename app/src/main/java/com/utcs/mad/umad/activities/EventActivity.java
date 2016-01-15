@@ -53,7 +53,7 @@ public class EventActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
-        EventInfo eventInfo = MainActivity.eventInfoListCache.get(getIntent().getIntExtra("id", 0));
+        EventInfo eventInfo = null; //MainActivity.eventInfoListCache.get(getIntent().getIntExtra("id", 0));
 
         // Setup non-network needed information
         setupToolbar(eventInfo);

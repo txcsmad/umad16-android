@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -21,31 +23,37 @@ import com.utcs.mad.umad.views.adapters.ScheduleAdapter;
 import com.utcs.mad.umad.activities.EventActivity;
 import com.utcs.mad.umad.activities.MainActivity;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ScheduleFragment extends Fragment {
 
-    static final String TAG = "ScheduleFragment";
-
-    // Required empty public constructor
-    public ScheduleFragment() {}
+    private static final String TAG = "ScheduleFragment";
+    private StickyListHeadersListView stickyListView;
+    private ArrayList<EventInfo> events;
+    private String[] times = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View v = inflater.inflate(R.layout.fragment_schedule, container, false);
-        final String[] times = getActivity().getResources().getStringArray(R.array.times);
-        final StickyListHeadersListView stickyListView = (StickyListHeadersListView) v.findViewById(R.id.schedule_list);
+        final ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_schedule, container, false);
+        times = getActivity().getResources().getStringArray(R.array.times);
+        events = new ArrayList<>();
 
+        setupStickyList(root);
+        getEventDataFromParse();
+        return root;
+    }
+
+    private void setupStickyList(ViewGroup root) {
+        stickyListView = (StickyListHeadersListView) root.findViewById(R.id.schedule_list);
         stickyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -54,77 +62,37 @@ public class ScheduleFragment extends Fragment {
                 getActivity().startActivity(intent);
             }
         });
-
-        // Get data from parse if cache is empty
-        if(MainActivity.eventInfoListCache == null || MainActivity.companiesCache == null) {
-            getEventDataFromParse(times, stickyListView);
-        } else {
-            ScheduleAdapter scheduleAdapter =
-                    new ScheduleAdapter(getActivity().getApplicationContext(), times, MainActivity.companiesCache);
-            stickyListView.setAdapter(scheduleAdapter);
-        }
-        return v;
+        ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
+        stickyListView.setAdapter(scheduleAdapter);
     }
 
-    private void getEventDataFromParse(final String[] times, final StickyListHeadersListView stickyListView) {
+    private void getEventDataFromParse() {
+        events.clear();
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Session");
-
-        query.orderByAscending("regTime").findInBackground(new FindCallback<ParseObject>() {
+        query.orderByAscending("startTime").findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
                 if (e == null) {
-                    MainActivity.eventInfoListCache = new ArrayList<EventInfo>();
+                    Log.i(TAG, "done: length: " + parseObjects.size());
                     for (ParseObject event : parseObjects) {
-                        storeEventInfo(event);
-                        storeCompanyInfo(event);
+                        try {
+                            ParseObject umad = event.fetchIfNeeded().getParseObject("umad");
+                            if (umad != null && umad.fetchIfNeeded().getInt("year") == 2016) {
+                                events.add(new EventInfo(event));
+                            }
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
                     }
 
-                    ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, MainActivity.companiesCache);
+                    Log.i(TAG, "getEventDataFromParse: " + events.size());
+                    ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
                     stickyListView.setAdapter(scheduleAdapter);
                 } else {
                     Log.e(TAG, "Parse Exception: " + e);
                 }
             }
         });
-    }
-
-    private void storeEventInfo(ParseObject event) {
-        EventInfo item = new EventInfo();
-        try {
-            ParseObject company = event.fetchIfNeeded().getParseObject("company");
-            item.setCompanyName((String) company.get("name"));
-            item.setCompanyWebsite((String) company.get("website"));
-            item.setTwitterHandle((String) company.get("twitterHandle"));
-            item.setStartingTime((Date) event.get("startTime"));
-            item.setEndingTime((Date) event.get("endTime"));
-            item.setRoom((String) event.get("room"));
-            item.setSessionName((String) event.get("sessionName"));
-            item.setSpeaker((String) event.get("speaker"));
-            item.setDescription((String) event.get("description"));
-            item.setRegTime((int) event.get("regTime"));
-            MainActivity.eventInfoListCache.add(item);
-        } catch (Exception e) {
-
-        }
-    }
-
-    private void storeCompanyInfo(ParseObject event) {
-        CompanyInfo company = new CompanyInfo();
-        try {
-            ParseObject companyParse = event.fetchIfNeeded().getParseObject("company");
-            company.setName((String) companyParse.get("name"));
-            ParseFile parseFile = companyParse.getParseFile("thumbnail");
-            byte[] data = null;
-            try {
-                data = parseFile.getData();
-            } catch (Exception ee) {
-                ee.printStackTrace();
-            }
-//            company.setData(data);
-            MainActivity.companiesCache.add(company);
-        } catch (Exception e) {
-
-        }
     }
 
     public static ScheduleFragment newInstance() {

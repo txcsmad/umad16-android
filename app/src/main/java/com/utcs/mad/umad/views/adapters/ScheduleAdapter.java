@@ -8,9 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.parse.ParseObject;
 import com.utcs.mad.umad.R;
 import com.utcs.mad.umad.activities.MainActivity;
 import com.utcs.mad.umad.models.CompanyInfo;
+import com.utcs.mad.umad.models.EventInfo;
 
 import java.util.ArrayList;
 
@@ -25,12 +27,12 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
 
     private String[] times;
     private LayoutInflater inflater;
-    private ArrayList<CompanyInfo> companies;
+    private ArrayList<EventInfo> events;
 
-    public ScheduleAdapter(Context context, String[] times, ArrayList<CompanyInfo> companies) {
+    public ScheduleAdapter(Context context, String[] times, ArrayList<EventInfo> events) {
         inflater = LayoutInflater.from(context);
         this.times = times;
-        this.companies = companies;
+        this.events = events;
     }
 
     private class HeaderViewHolder {
@@ -57,12 +59,12 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
 
     @Override
     public int getCount() {
-        return companies.size();
+        return events.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return companies.get(position).getName();
+        return events.get(position).getSessionName();
     }
 
     @Override
@@ -82,12 +84,10 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
         }
 
         // Update view with event info
-        if (MainActivity.eventInfoListCache.size() != 0) {
-            holder.text.setText(MainActivity.eventInfoListCache.get(position).getCompanyName());
-            holder.sessionName.setText(MainActivity.eventInfoListCache.get(position).getSessionName());
-            holder.roomInfo.setText(MainActivity.eventInfoListCache.get(position).getRoom());
-            holder.sponsorIcon.setImageBitmap(companies.get(position).getImage());
-        }
+        holder.text.setText(events.get(position).getCompanyName());
+        holder.sessionName.setText(events.get(position).getSessionName());
+        holder.roomInfo.setText(events.get(position).getRoom());
+//        holder.sponsorIcon.setImageBitmap(events.get(position).get());
 
         return convertView;
     }
@@ -102,19 +102,13 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
         } else {
             holder = (HeaderViewHolder) convertView.getTag();
         }
-        if (MainActivity.eventInfoListCache.size() != 0) {
-            holder.timeText.setText("" + times[MainActivity.eventInfoListCache.get(position).getRegTime() - 1]);
-        }
+        holder.timeText.setText("" + events.get(position).getStartingTime());
         return convertView;
     }
 
     @Override
     public long getHeaderId(int position) {
-        if (MainActivity.eventInfoListCache.size() != 0) {
-            return MainActivity.eventInfoListCache.get(position).getRegTime();
-        } else {
-            return 0;
-        }
+        return events.size();
     }
 
 }

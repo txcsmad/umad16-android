@@ -1,9 +1,14 @@
 package com.utcs.mad.umad.models;
 
+import com.parse.ParseException;
+import com.parse.ParseObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 /**
@@ -20,7 +25,29 @@ public class EventInfo {
     private String speaker;
     private String twitterHandle;
     private String description;
+    private ArrayList<String> topics;
+    private int capacity;
+    private String email;
     private int regTime;
+
+    public EventInfo(ParseObject parseEvent) {
+        try {
+            topics = new ArrayList<>();
+            for (Object wannaBeString : parseEvent.fetchIfNeeded().getList("topicTags")) {
+                topics.add((String) wannaBeString);
+            }
+            setStartingTime(parseEvent.getDate("startTime"));
+            setEndingTime(parseEvent.getDate("endTime"));
+            description = parseEvent.fetchIfNeeded().getString("descriptionText");
+            sessionName = parseEvent.fetchIfNeeded().getString("name");
+            capacity = parseEvent.fetchIfNeeded().getInt("capacity");
+            room = parseEvent.fetchIfNeeded().getString("room");
+            email = parseEvent.fetchIfNeeded().getString("email");
+            speaker = parseEvent.fetchIfNeeded().getString("speaker");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
     public String getCompanyWebsite() {
         return companyWebsite;
@@ -87,7 +114,7 @@ public class EventInfo {
     public void setEndingTime(Date endingTime) {
         DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        this.startingTime = dateFormat.format(endingTime);
+        this.endingTime = dateFormat.format(endingTime);
     }
 
     public String getSessionName() {

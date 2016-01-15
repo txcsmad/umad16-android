@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class SponsorsFragment extends Fragment {
 
-    static final String LOG_TAG = "SponsorsFragment";
+    static final String TAG = "SponsorsFragment";
     private ArrayList<CompanyInfo> sponsors;
 
     private RecyclerView recyclerView;
@@ -88,12 +88,12 @@ public class SponsorsFragment extends Fragment {
                 if( e == null) {
                     addParseSponsorsToList(parseObjects);
                 } else {
-                    Log.e(LOG_TAG, "exception parse");
+                    Log.e(TAG, "exception parse");
                 }
             }
         });
 
-        recyclerView.getAdapter().notifyDataSetChanged();
+        updateViewData();
     }
 
     private void addParseSponsorsToList(List<ParseObject> parseObjects) {
@@ -101,25 +101,29 @@ public class SponsorsFragment extends Fragment {
             ParseObject umad = sponsor.getParseObject("umad");
 
             try {
-                if ((int) umad.fetchIfNeeded().get("year") == 2016) {
+                if (umad.fetchIfNeeded().getInt("year") == 2016) {
                     ParseObject curCompanyInfo = sponsor.getParseObject("company");
                     String level = (String) sponsor.get("level");
                     CompanyInfo curSponsor = new CompanyInfo(curCompanyInfo, level);
                     sponsors.add(curSponsor);
-                    Collections.sort(sponsors, new Comparator<CompanyInfo>() {
-                        @Override
-                        public int compare(CompanyInfo  company1, CompanyInfo  company2)
-                        {
-                            if(company1.getLevel() < company2.getLevel()) return 1;
-                            else if (company1.getLevel() > company2.getLevel()) return -1;
-                            else return 0;
-                        }
-                    });
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void updateViewData() {
+        Collections.sort(sponsors, new Comparator<CompanyInfo>() {
+            @Override
+            public int compare(CompanyInfo  company1, CompanyInfo  company2)
+            {
+                if(company1.getLevel() < company2.getLevel()) return 1;
+                else if (company1.getLevel() > company2.getLevel()) return -1;
+                else return 0;
+            }
+        });
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     public static SponsorsFragment newInstance() {
