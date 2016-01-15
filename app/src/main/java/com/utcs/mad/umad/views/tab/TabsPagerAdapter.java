@@ -83,9 +83,9 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch(position) {
-            case 0: return ScheduleFragment.newInstance("CalendarFragment");
-            case 1: return TwitterFeedFragment.newInstance("TwitterFeedFragment");
-            case 2: return SponsorsFragment.newInstance("SponsorsFragment");
+            case 0: return ScheduleFragment.newInstance();
+            case 1: return TwitterFeedFragment.newInstance();
+            case 2: return SponsorsFragment.newInstance();
         }
 
         return null;

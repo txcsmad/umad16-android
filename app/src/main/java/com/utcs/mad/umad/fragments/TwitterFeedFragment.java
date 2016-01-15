@@ -4,33 +4,29 @@ package com.utcs.mad.umad.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterApiClient;
-import com.twitter.sdk.android.core.TwitterCore;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.services.StatusesService;
-import com.utcs.mad.umad.views.adapters.CustomTweetViewAdapter;
+import com.twitter.sdk.android.tweetui.TweetTimelineListAdapter;
+import com.twitter.sdk.android.tweetui.UserTimeline;
+import com.utcs.mad.umad.BuildConfig;
 import com.utcs.mad.umad.R;
-import com.utcs.mad.umad.activities.MainActivity;
 
-import java.util.List;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class TwitterFeedFragment extends Fragment {
 
-    CustomTweetViewAdapter adapter;
     StatusesService statusesService;
     SwipeRefreshLayout swipeLayout;
+    private ListView twitterListView;
 
     // Required empty public constructor
     public TwitterFeedFragment() {}
@@ -39,21 +35,17 @@ public class TwitterFeedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_twitter_feed, container, false);
-        setupTwitterList(root);
+        setupTwitter((ViewGroup) root);
         setupSwipeRefreshLayout(root);
 
         return root;
     }
 
     // Gather the tweets from MAD account and put them into the list adapter
-    private void setupTwitterList(View root) {
-        TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient(MainActivity.twitterSession);
-
-        ListView timeline = (ListView) root.findViewById(R.id.timeline);
-        adapter = new CustomTweetViewAdapter(getActivity().getApplicationContext());
-        timeline.setAdapter(adapter);
-
-        statusesService = twitterApiClient.getStatusesService();
+    private void setupTwitter(ViewGroup root) {
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET);
+        Fabric.with(getActivity(), new Twitter(authConfig));
+        twitterListView = (ListView) root.findViewById(R.id.timeline);
         getTwitterFeed();
     }
 
@@ -71,31 +63,15 @@ public class TwitterFeedFragment extends Fragment {
     }
 
     private void getTwitterFeed() {
-        if(statusesService == null)
-            return;
-
-        statusesService.userTimeline(null, getString(R.string.twitter_mad_username), null, null, null, null, null, null, null,
-                new Callback<List<Tweet>>() {
-                    @Override
-                    public void success(Result<List<Tweet>> listResult) {
-                        adapter.setTweets(listResult.data);
-                        adapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void failure(TwitterException e) {
-                        Log.e("TwitterFeed", e.toString());
-                    }
-        });
+        UserTimeline userTimeline = new UserTimeline.Builder()
+                .screenName("utcsmad")
+                .build();
+        TweetTimelineListAdapter adapter = new TweetTimelineListAdapter(getActivity(), userTimeline);
+        twitterListView.setAdapter(adapter);
     }
 
-    public static TwitterFeedFragment newInstance(String text) {
+    public static TwitterFeedFragment newInstance() {
         TwitterFeedFragment f = new TwitterFeedFragment();
-        Bundle b = new Bundle();
-        b.putString("msg", text);
-
-        f.setArguments(b);
-
         return f;
     }
 }

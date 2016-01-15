@@ -2,7 +2,6 @@ package com.utcs.mad.umad.fragments;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,7 +14,7 @@ import com.parse.FindCallback;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.utcs.mad.umad.models.Company;
+import com.utcs.mad.umad.models.CompanyInfo;
 import com.utcs.mad.umad.models.EventInfo;
 import com.utcs.mad.umad.R;
 import com.utcs.mad.umad.views.adapters.ScheduleAdapter;
@@ -35,7 +34,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
  */
 public class ScheduleFragment extends Fragment {
 
-    static final String LOG_TAG = "ScheduleFragment";
+    static final String TAG = "ScheduleFragment";
 
     // Required empty public constructor
     public ScheduleFragment() {}
@@ -68,7 +67,7 @@ public class ScheduleFragment extends Fragment {
     }
 
     private void getEventDataFromParse(final String[] times, final StickyListHeadersListView stickyListView) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Events");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Session");
 
         query.orderByAscending("regTime").findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -83,7 +82,7 @@ public class ScheduleFragment extends Fragment {
                     ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, MainActivity.companiesCache);
                     stickyListView.setAdapter(scheduleAdapter);
                 } else {
-                    Log.e(LOG_TAG, "Parse Exception: " + e);
+                    Log.e(TAG, "Parse Exception: " + e);
                 }
             }
         });
@@ -91,40 +90,45 @@ public class ScheduleFragment extends Fragment {
 
     private void storeEventInfo(ParseObject event) {
         EventInfo item = new EventInfo();
-        item.setCompanyName((String) event.get("company"));
-        item.setCompanyWebsite((String) event.get("companyWebsite"));
-        item.setStartingTime((Date) event.get("startTime"));
-        item.setEndingTime((Date) event.get("endTime"));
-        item.setRoom((String) event.get("room"));
-        item.setSessionName((String) event.get("sessionName"));
-        item.setSpeaker((String) event.get("speaker"));
-        item.setTwitterHandle((String) event.get("twitterHandle"));
-        item.setDescription((String) event.get("description"));
-        item.setRegTime((int) event.get("regTime"));
-        MainActivity.eventInfoListCache.add(item);
+        try {
+            ParseObject company = event.fetchIfNeeded().getParseObject("company");
+            item.setCompanyName((String) company.get("name"));
+            item.setCompanyWebsite((String) company.get("website"));
+            item.setTwitterHandle((String) company.get("twitterHandle"));
+            item.setStartingTime((Date) event.get("startTime"));
+            item.setEndingTime((Date) event.get("endTime"));
+            item.setRoom((String) event.get("room"));
+            item.setSessionName((String) event.get("sessionName"));
+            item.setSpeaker((String) event.get("speaker"));
+            item.setDescription((String) event.get("description"));
+            item.setRegTime((int) event.get("regTime"));
+            MainActivity.eventInfoListCache.add(item);
+        } catch (Exception e) {
+
+        }
     }
 
     private void storeCompanyInfo(ParseObject event) {
-        Company company = new Company();
-        company.setCompanyName((String) event.get("company"));
-        ParseFile parseFile = event.getParseFile("thumbnail");
-        byte[] data = null;
+        CompanyInfo company = new CompanyInfo();
         try {
-            data = parseFile.getData();
-        } catch (Exception ee) {
-            ee.printStackTrace();
+            ParseObject companyParse = event.fetchIfNeeded().getParseObject("company");
+            company.setName((String) companyParse.get("name"));
+            ParseFile parseFile = companyParse.getParseFile("thumbnail");
+            byte[] data = null;
+            try {
+                data = parseFile.getData();
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+//            company.setData(data);
+            MainActivity.companiesCache.add(company);
+        } catch (Exception e) {
+
         }
-        company.setData(data);
-        MainActivity.companiesCache.add(company);
     }
 
-    public static ScheduleFragment newInstance(String text) {
+    public static ScheduleFragment newInstance() {
         ScheduleFragment f = new ScheduleFragment();
-        Bundle b = new Bundle();
-        b.putString("msg", text);
-
-        f.setArguments(b);
-
         return f;
     }
 }

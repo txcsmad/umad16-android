@@ -8,19 +8,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterSession;
-import com.utcs.mad.umad.BuildConfig;
-import com.utcs.mad.umad.models.Company;
+import com.utcs.mad.umad.models.CompanyInfo;
 import com.utcs.mad.umad.models.EventInfo;
 import com.utcs.mad.umad.R;
 import com.utcs.mad.umad.views.tab.SlidingTabsFragment;
 
 import java.util.ArrayList;
-
-import io.fabric.sdk.android.Fabric;
 
 /**
  * Main Activity
@@ -31,15 +25,12 @@ import io.fabric.sdk.android.Fabric;
  */
 public class MainActivity extends ActionBarActivity{
 
-    public static String TWITTER_KEY;
-    public static  String TWITTER_SECRET;
     public static int screenWidth;
     public static int screenHeight;
     public static int screenDensity;
     public Toolbar toolbar;
     public static ArrayList<EventInfo> eventInfoListCache;
-    public static ArrayList<Company> companiesCache = new ArrayList<Company>();
-    public static TwitterSession twitterSession;
+    public static ArrayList<CompanyInfo> companiesCache = new ArrayList<CompanyInfo>();
 
 
     @Override
@@ -47,7 +38,6 @@ public class MainActivity extends ActionBarActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupTwitter();
         setupToolbar();
 
         // Gather information here for static knowledge of screen dimensions to prevent issues
@@ -61,17 +51,6 @@ public class MainActivity extends ActionBarActivity{
             transaction.replace(R.id.content_fragment, fragment);
             transaction.commit();
         }
-    }
-
-    private void setupTwitter() {
-        TWITTER_KEY = BuildConfig.TWITTER_KEY;
-        TWITTER_SECRET = BuildConfig.TWITTER_SECRET;
-        long MAD_TWITTER_ID = Long.parseLong(BuildConfig.TWITTER_MAD_ID);
-
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        Fabric.with(this, new Twitter(authConfig));
-        TwitterAuthToken twitterAuthToken = new TwitterAuthToken(BuildConfig.TWITTER_ACCESS_TOKEN, BuildConfig.TWITTER_ACCESS_TOKEN_SECRET);
-        twitterSession = new TwitterSession(twitterAuthToken, MAD_TWITTER_ID , getString(R.string.twitter_mad_username));
     }
 
     private void setupToolbar() {
