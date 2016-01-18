@@ -33,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:text="room"
+                android:textColor="#ff3d3d3d"
                 android:fontFamily="sans-serif-light"
                 android:layout_alignParentRight="true"
                 android:paddingRight="10dp"/>
@@ -45,7 +46,7 @@
             android:layout_height="wrap_content"
             android:textColor="#ff3d3d3d"
             android:fontFamily="sans-serif-condensed"
-            android:text="Whatsup"
+            android:text="Company Name"
             android:textSize="20sp"/>
         <TextView
             android:id="@+id/subtitle_text"
@@ -53,7 +54,7 @@
             android:layout_height="wrap_content"
             android:textColor="#ff747474"
             android:fontFamily="sans-serif-light"
-            android:text="Whatsup"
+            android:text="Session Name"
             android:singleLine="true"
             android:ellipsize="end"
             android:textSize="15sp"/>

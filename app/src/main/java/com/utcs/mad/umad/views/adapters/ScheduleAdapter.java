@@ -104,7 +104,7 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
         holder.text.setText(event.getCompanyName());
         holder.sessionName.setText(event.getSessionName());
         holder.roomInfo.setText(event.getRoom());
-        Log.i(TAG, "getView: " + event.getRoom());
+//        Log.i(TAG, "getView: " + event.getRoom());
         ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Company");
         query2.whereEqualTo("name", event.getCompanyName());
         query2.getFirstInBackground(new GetCallback<ParseObject>() {
