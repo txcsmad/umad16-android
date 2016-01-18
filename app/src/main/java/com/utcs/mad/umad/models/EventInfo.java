@@ -46,6 +46,10 @@ public class EventInfo implements Parcelable {
             room = parseEvent.fetchIfNeeded().getString("room");
             email = parseEvent.fetchIfNeeded().getString("email");
             speaker = parseEvent.fetchIfNeeded().getString("speaker");
+
+            ParseObject companyParse = parseEvent.getParseObject("company");
+            companyName = companyParse.fetchIfNeeded().getString("name");
+            companyWebsite = companyParse.fetchIfNeeded().getString("website");
         } catch (ParseException e) {
             e.printStackTrace();
         }

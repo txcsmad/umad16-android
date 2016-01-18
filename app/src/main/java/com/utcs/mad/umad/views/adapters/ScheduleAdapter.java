@@ -1,6 +1,7 @@
 package com.utcs.mad.umad.views.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
  * headers to be sticky, in order for a better UI experience
  */
 public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAdapter {
+
+    private static final String TAG = "ScheduleAdapter";
 
     private String[] times;
     private LayoutInflater inflater;
@@ -82,11 +85,13 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+        EventInfo event = events.get(position);
 
         // Update view with event info
-        holder.text.setText(events.get(position).getCompanyName());
-        holder.sessionName.setText(events.get(position).getSessionName());
-        holder.roomInfo.setText(events.get(position).getRoom());
+        holder.text.setText(event.getCompanyName());
+        holder.sessionName.setText(event.getSessionName());
+        holder.roomInfo.setText(event.getRoom());
+        Log.i(TAG, "getView: " + event.getRoom());
 //        holder.sponsorIcon.setImageBitmap(events.get(position).get());
 
         return convertView;

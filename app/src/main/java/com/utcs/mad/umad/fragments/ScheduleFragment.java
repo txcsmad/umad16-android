@@ -63,7 +63,7 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity().getApplication(), EventActivity.class);
-                intent.putExtra("id", position);
+                intent.putExtra("event", events.get(position));
                 getActivity().startActivity(intent);
             }
         });

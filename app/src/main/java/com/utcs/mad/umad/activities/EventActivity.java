@@ -53,7 +53,7 @@ public class EventActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
-        EventInfo eventInfo = null; //MainActivity.eventInfoListCache.get(getIntent().getIntExtra("id", 0));
+        EventInfo eventInfo = getIntent().getParcelableExtra("event");
 
         // Setup non-network needed information
         setupToolbar(eventInfo);
@@ -120,13 +120,13 @@ public class EventActivity extends ActionBarActivity {
 
     // Gets the companyImage value from parse in order to set the cover image to the correct image
     private void updateCoverImage(EventInfo eventInfo) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Events");
-        query.whereEqualTo("company", eventInfo.getCompanyName());
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Company");
+        query.whereEqualTo("name", eventInfo.getCompanyName());
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
                 if(e == null) {
-                    ParseFile thumbnail = (ParseFile) parseObject.get("companyImage");
+                    ParseFile thumbnail = (ParseFile) parseObject.get("image");
                     thumbnail.getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(byte[] bytes, ParseException e) {
@@ -149,8 +149,8 @@ public class EventActivity extends ActionBarActivity {
 
     // Gets the thumbnail value from parse to update the event info header thumbnail
     private void updateThumbnail(EventInfo eventInfo) {
-        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Sponsors");
-        query2.whereEqualTo("companyName", eventInfo.getCompanyName());
+        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Company");
+        query2.whereEqualTo("name", eventInfo.getCompanyName());
         query2.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
@@ -169,7 +169,6 @@ public class EventActivity extends ActionBarActivity {
                         }
                     });
                 }
-
             }
         });
     }
