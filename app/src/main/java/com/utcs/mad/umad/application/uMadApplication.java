@@ -1,4 +1,4 @@
-package com.utcs.mad.umad.network;
+package com.utcs.mad.umad.application;
 
 import android.app.Application;
 
@@ -6,7 +6,6 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseUser;
 import com.utcs.mad.umad.BuildConfig;
-import com.utcs.mad.umad.R;
 
 /**
  * uMAD Application

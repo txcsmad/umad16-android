@@ -1,6 +1,8 @@
 package com.utcs.mad.umad.models;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -9,25 +11,29 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 
+import java.util.ArrayList;
+
 /**
  * CompanyInfo
  * This is a model to hold information for all of the company sponsors/entites that are in uMAD
  */
-public class CompanyInfo {
+public class CompanyInfo implements Parcelable {
 
     private static final String TAG = "CompanyInfo";
 
     private String name;
     private String website;
-    private Bitmap image;
-    private Bitmap thumbnail;
     private String twitterHandle;
     private int level;
+    private Bitmap image;
+    private Bitmap thumbnail;
 
     public CompanyInfo() {
         this.name = "";
         this.website = "";
+        this.twitterHandle = "";
         this.image = null;
+        this.thumbnail = null;
     }
 
     public CompanyInfo(ParseObject parseObject, String level) throws ParseException {
@@ -101,14 +107,66 @@ public class CompanyInfo {
     }
 
     public void createImage(byte[] data) {
-        this.image = Helper.decodeBitmapFromByteArray(data, data.length, data.length);
-
-//        this.image = Bitmap.createScaledBitmap(this.image, 512, 512, true);
+        this.image = Helper.byteArrayToBitmap(data, data.length, data.length);
     }
 
     public void createThumbnail(byte[] data) {
-        this.thumbnail = Helper.decodeBitmapFromByteArray(data, data.length, data.length);
-
-//        this.thumbnail = Bitmap.createScaledBitmap(this.image, 256, 256, true);
+        this.thumbnail = Helper.byteArrayToBitmap(data, data.length, data.length);
     }
+
+    /*
+     * PARCELABLE
+     */
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(website);
+        dest.writeString(twitterHandle);
+        dest.writeInt(level);
+
+        byte [] imageBytes = Helper.bitmapToByteArray(image);
+        dest.writeInt(imageBytes.length);
+        dest.writeByteArray(imageBytes);
+
+        byte [] thumbnailBytes = Helper.bitmapToByteArray(thumbnail);
+        dest.writeInt(thumbnailBytes.length);
+        dest.writeByteArray(thumbnailBytes);
+    }
+
+    private void readFromParcel(Parcel in) {
+        name = in.readString();
+        website = in.readString();
+        twitterHandle = in.readString();
+        level = in.readInt();
+
+        int imageLength = in.readInt();
+        byte[] imageBytes = new byte[imageLength];
+        in.readByteArray(imageBytes);
+        image = Helper.byteArrayToBitmap(imageBytes, imageBytes.length, imageBytes.length);
+
+        int thumbnailLength = in.readInt();
+        byte[] thumbnailBytes = new byte[thumbnailLength];
+        in.readByteArray(thumbnailBytes);
+        image = Helper.byteArrayToBitmap(thumbnailBytes, thumbnailBytes.length, thumbnailBytes.length);
+    }
+
+    private CompanyInfo(Parcel in) {
+        readFromParcel(in);
+    }
+
+    public static Parcelable.Creator<CompanyInfo> CREATOR = new Parcelable.Creator<CompanyInfo>() {
+        public CompanyInfo createFromParcel(Parcel source) {
+            return new CompanyInfo(source);
+        }
+
+        public CompanyInfo[] newArray(int size) {
+            return new CompanyInfo[size];
+        }
+    };
 }

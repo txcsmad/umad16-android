@@ -138,7 +138,7 @@ public class EventActivity extends ActionBarActivity {
                                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, displaymetrics.heightPixels / 3);
 
                                 companyImage_ImageView.setLayoutParams(layoutParams);
-                                companyImage_ImageView.setImageBitmap(Helper.decodeBitmapFromByteArray(bytes, width, width));
+                                companyImage_ImageView.setImageBitmap(Helper.byteArrayToBitmap(bytes, width, width));
                             }
                         }
                     });
@@ -164,7 +164,7 @@ public class EventActivity extends ActionBarActivity {
                                 getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
                                 int width = displaymetrics.widthPixels / 4;
 
-                                companyThumbnail.setImageBitmap(Helper.decodeBitmapFromByteArray(bytes, width, width));
+                                companyThumbnail.setImageBitmap(Helper.byteArrayToBitmap(bytes, width, width));
                             }
                         }
                     });

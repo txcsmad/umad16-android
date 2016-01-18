@@ -4,6 +4,7 @@ package com.utcs.mad.umad.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +20,15 @@ import com.parse.ParseQuery;
 import com.utcs.mad.umad.models.CompanyInfo;
 import com.utcs.mad.umad.models.EventInfo;
 import com.utcs.mad.umad.R;
+import com.utcs.mad.umad.utils.GeneralUtils;
+import com.utcs.mad.umad.utils.UserPrefStorage;
 import com.utcs.mad.umad.views.adapters.ScheduleAdapter;
 import com.utcs.mad.umad.activities.EventActivity;
 import com.utcs.mad.umad.activities.MainActivity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,9 +37,10 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ScheduleFragment extends Fragment {
+public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "ScheduleFragment";
+    private SwipeRefreshLayout refreshLayout;
     private StickyListHeadersListView stickyListView;
     private ArrayList<EventInfo> events;
     private String[] times = null;
@@ -48,7 +53,7 @@ public class ScheduleFragment extends Fragment {
         events = new ArrayList<>();
 
         setupStickyList(root);
-        getEventDataFromParse();
+        getEventData(false);
         return root;
     }
 
@@ -64,16 +69,34 @@ public class ScheduleFragment extends Fragment {
         });
         ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
         stickyListView.setAdapter(scheduleAdapter);
+
+        refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipe_refresh);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setRefreshing(true);
+    }
+
+    private void getEventData(boolean forceGet) {
+        Calendar cacheDate = UserPrefStorage.getScheduleCacheDate(getContext());
+        if(GeneralUtils.isCacheValid(forceGet, cacheDate)) {
+            Log.i(TAG, "getEventData: Network");
+            getEventDataFromParse();
+        } else {
+            Log.i(TAG, "getEventData: Cache");
+            events = UserPrefStorage.getScheduleCache(getContext());
+            ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
+            stickyListView.setAdapter(scheduleAdapter);
+        }
     }
 
     private void getEventDataFromParse() {
+        refreshLayout.setRefreshing(true);
         events.clear();
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Session");
         query.orderByAscending("startTime").findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
                 if (e == null) {
-                    Log.i(TAG, "done: length: " + parseObjects.size());
+//                    Log.i(TAG, "done: length: " + parseObjects.size());
                     for (ParseObject event : parseObjects) {
                         try {
                             ParseObject umad = event.fetchIfNeeded().getParseObject("umad");
@@ -85,12 +108,14 @@ public class ScheduleFragment extends Fragment {
                         }
                     }
 
-                    Log.i(TAG, "getEventDataFromParse: " + events.size());
+//                    Log.i(TAG, "getEventDataFromParse: " + events.size());
+                    UserPrefStorage.setScheduleCache(getContext(), events);
                     ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
                     stickyListView.setAdapter(scheduleAdapter);
                 } else {
                     Log.e(TAG, "Parse Exception: " + e);
                 }
+                refreshLayout.setRefreshing(false);
             }
         });
     }
@@ -98,5 +123,10 @@ public class ScheduleFragment extends Fragment {
     public static ScheduleFragment newInstance() {
         ScheduleFragment f = new ScheduleFragment();
         return f;
+    }
+
+    @Override
+    public void onRefresh() {
+        getEventData(true);
     }
 }

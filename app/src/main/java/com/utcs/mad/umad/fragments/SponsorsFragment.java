@@ -2,6 +2,7 @@ package com.utcs.mad.umad.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,10 +16,14 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.utcs.mad.umad.models.CompanyInfo;
 import com.utcs.mad.umad.R;
+import com.utcs.mad.umad.utils.GeneralUtils;
+import com.utcs.mad.umad.utils.UserPrefStorage;
 import com.utcs.mad.umad.views.SpacesItemDecoration;
+import com.utcs.mad.umad.views.adapters.ScheduleAdapter;
 import com.utcs.mad.umad.views.adapters.SponsorsRecyclerView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,11 +32,12 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SponsorsFragment extends Fragment {
+public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     static final String TAG = "SponsorsFragment";
     private ArrayList<CompanyInfo> sponsors;
 
+    private SwipeRefreshLayout refreshLayout;
     private RecyclerView recyclerView;
 
     // Required empty public constructor
@@ -45,7 +51,7 @@ public class SponsorsFragment extends Fragment {
         sponsors = new ArrayList<>();
 
         setupRecyclerView(rootView);
-        getSponsorParseData();
+        getSponsorData(false);
 
         return rootView;
     }
@@ -76,9 +82,25 @@ public class SponsorsFragment extends Fragment {
         recyclerView.setLayoutManager(manager);
         recyclerView.addItemDecoration(new SpacesItemDecoration(25));
 
+        refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipe_refresh);
+        refreshLayout.setOnRefreshListener(this);
+    }
+
+    private void getSponsorData(boolean forceGet) {
+        Calendar cacheDate = UserPrefStorage.getCompanyCacheDate(getContext());
+        if(GeneralUtils.isCacheValid(forceGet, cacheDate)) {
+            Log.i(TAG, "getSponsorData: Network");
+            getSponsorParseData();
+        } else {
+            Log.i(TAG, "getSponsorData: Cache");
+            sponsors.clear();
+            sponsors.addAll(UserPrefStorage.getCompanyCache(getContext()));
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     private void getSponsorParseData() {
+        refreshLayout.setRefreshing(true);
         sponsors.clear();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Sponsor");
@@ -87,9 +109,12 @@ public class SponsorsFragment extends Fragment {
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if( e == null) {
                     addParseSponsorsToList(parseObjects);
+                    UserPrefStorage.setCompanyCache(getContext(), sponsors);
+                    Log.i(TAG, "done: SPONSORS");
                 } else {
                     Log.e(TAG, "exception parse");
                 }
+                refreshLayout.setRefreshing(false);
             }
         });
 
@@ -111,6 +136,7 @@ public class SponsorsFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+        Log.i(TAG, "addParseSponsorsToList: ADDING CACHE FOR SPONSORS");
     }
 
     private void updateViewData() {
@@ -132,4 +158,8 @@ public class SponsorsFragment extends Fragment {
     }
 
 
+    @Override
+    public void onRefresh() {
+        getSponsorData(true);
+    }
 }

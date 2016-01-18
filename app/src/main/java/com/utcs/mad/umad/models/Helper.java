@@ -3,6 +3,9 @@ package com.utcs.mad.umad.models;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 /**
  * Helper
  * This is to help with the image calculations and resizing and decreasing the size of the images
@@ -32,7 +35,7 @@ public class Helper {
         return inSampleSize;
     }
 
-    public static Bitmap decodeBitmapFromByteArray(byte[] data,int reqWidth, int reqHeight) {
+    public static Bitmap byteArrayToBitmap (byte[] data,int reqWidth, int reqHeight) {
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -45,6 +48,20 @@ public class Helper {
         options.inJustDecodeBounds = false;
 
         return BitmapFactory.decodeByteArray(data, 0, data.length, options);
+    }
+
+    public static byte[] bitmapToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
+        byte[] array = stream.toByteArray();
+        try {
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return array;
+
+
     }
 
 }

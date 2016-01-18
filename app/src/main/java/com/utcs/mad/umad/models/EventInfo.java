@@ -1,5 +1,8 @@
 package com.utcs.mad.umad.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.parse.ParseException;
 import com.parse.ParseObject;
 
@@ -15,7 +18,7 @@ import java.util.TimeZone;
  * EventInfo Model
  * This is to hold and represent all the information for events in one location
  */
-public class EventInfo {
+public class EventInfo implements Parcelable {
     private String companyName;
     private String companyWebsite;
     private String startingTime;
@@ -28,7 +31,6 @@ public class EventInfo {
     private ArrayList<String> topics;
     private int capacity;
     private String email;
-    private int regTime;
 
     public EventInfo(ParseObject parseEvent) {
         try {
@@ -125,7 +127,64 @@ public class EventInfo {
         this.sessionName = sessionName;
     }
 
-    public int getRegTime() { return regTime; }
+    /*
+     * PARCELABLE
+     */
 
-    public void setRegTime(int regTime) { this.regTime = regTime; }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(companyName);
+        dest.writeString(companyWebsite);
+        dest.writeString(startingTime);
+        dest.writeString(endingTime);
+        dest.writeString(room);
+        dest.writeString(sessionName);
+        dest.writeString(speaker);
+        dest.writeString(twitterHandle);
+        dest.writeString(description);
+        dest.writeInt(topics.size());
+        for(String topic : topics) {
+            dest.writeString(topic);
+        }
+        dest.writeInt(capacity);
+        dest.writeString(email);
+    }
+
+    private void readFromParcel(Parcel in) {
+        companyName = in.readString();
+        companyWebsite = in.readString();
+        startingTime = in.readString();
+        endingTime = in.readString();
+        room = in.readString();
+        sessionName = in.readString();
+        speaker = in.readString();
+        twitterHandle = in.readString();
+        description = in.readString();
+        int topicSize = in.readInt();
+        topics = new ArrayList<>();
+        for (int topic = 0; topic < topicSize; topic++) {
+            topics.add(in.readString());
+        }
+        capacity = in.readInt();
+        email = in.readString();
+    }
+
+    private EventInfo(Parcel in) {
+        readFromParcel(in);
+    }
+
+    public static Parcelable.Creator<EventInfo> CREATOR = new Parcelable.Creator<EventInfo>() {
+        public EventInfo createFromParcel(Parcel source) {
+            return new EventInfo(source);
+        }
+
+        public EventInfo[] newArray(int size) {
+            return new EventInfo[size];
+        }
+    };
 }
