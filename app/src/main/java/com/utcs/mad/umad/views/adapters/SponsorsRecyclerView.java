@@ -4,14 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import com.parse.GetCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.squareup.picasso.Picasso;
 import com.utcs.mad.umad.R;
 import com.utcs.mad.umad.models.CompanyInfo;
+import com.utcs.mad.umad.models.Helper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +67,7 @@ public class SponsorsRecyclerView extends RecyclerView.Adapter<SponsorsRecyclerV
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-        holder.logo.setImageBitmap(sponsors.get(position).getImage());
+        attachImageToView(holder, sponsors.get(position).getName());
 //        holder.logo.setBackgroundColor(context.getResources().getColor(R.color.primary_accent));
         holder.logo.setContentDescription(sponsors.get(position).getName());
         holder.logo.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +82,27 @@ public class SponsorsRecyclerView extends RecyclerView.Adapter<SponsorsRecyclerV
         ViewGroup.LayoutParams layoutParams = holder.logo.getLayoutParams();
         layoutParams.height = 300;
         holder.logo.setLayoutParams(layoutParams);
+    }
+
+    private void attachImageToView(final ViewHolder holder, String name) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Company");
+        query.whereEqualTo("name", name);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e == null) {
+                    ParseFile thumbnail = (ParseFile) parseObject.get("image");
+                    thumbnail.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] bytes, ParseException e) {
+                            if(e == null) {
+                                holder.logo.setImageBitmap(Helper.byteArrayToBitmap(bytes, 1024, 1024));
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override

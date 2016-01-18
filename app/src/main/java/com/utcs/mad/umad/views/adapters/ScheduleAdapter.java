@@ -1,6 +1,7 @@
 package com.utcs.mad.umad.views.adapters;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +10,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.parse.GetCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.utcs.mad.umad.R;
 import com.utcs.mad.umad.activities.MainActivity;
 import com.utcs.mad.umad.models.CompanyInfo;
 import com.utcs.mad.umad.models.EventInfo;
+import com.utcs.mad.umad.models.Helper;
 
 import java.util.ArrayList;
 
@@ -77,7 +84,7 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        final ViewHolder holder;
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.row_schedule_item, parent, false);
             holder = new ViewHolder(convertView);
@@ -92,7 +99,24 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
         holder.sessionName.setText(event.getSessionName());
         holder.roomInfo.setText(event.getRoom());
         Log.i(TAG, "getView: " + event.getRoom());
-//        holder.sponsorIcon.setImageBitmap(events.get(position).get());
+        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Company");
+        query2.whereEqualTo("name", event.getCompanyName());
+        query2.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e == null) {
+                    ParseFile thumbnail = (ParseFile) parseObject.get("thumbnail");
+                    thumbnail.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] bytes, ParseException e) {
+                            if(e == null) {
+                                holder.sponsorIcon.setImageBitmap(Helper.byteArrayToBitmap(bytes, 256, 256));
+                            }
+                        }
+                    });
+                }
+            }
+        });
 
         return convertView;
     }
