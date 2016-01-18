@@ -23,8 +23,12 @@ import com.utcs.mad.umad.models.EventInfo;
 import com.utcs.mad.umad.models.Helper;
 import com.utcs.mad.umad.utils.GeneralUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
@@ -139,9 +143,11 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
 
     @Override
     public long getHeaderId(int position) {
-        Calendar cal = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         try {
-            cal.setTime(GeneralUtils.STICKY_DATE_FORMAT.parse(events.get(position).getStartingTime()));
+            cal.setTime(dateFormat.parse(events.get(position).getStartingTime()));
         } catch (java.text.ParseException e) {
             e.printStackTrace();
         }

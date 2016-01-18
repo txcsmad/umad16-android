@@ -113,7 +113,9 @@ public class EventInfo implements Parcelable {
     }
 
     public void setStartingTime(Date startingTime) {
-        this.startingTime = GeneralUtils.STICKY_DATE_FORMAT.format(startingTime);
+        DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        this.startingTime = dateFormat.format(startingTime);
     }
 
     public String getEndingTime() {
@@ -121,7 +123,9 @@ public class EventInfo implements Parcelable {
     }
 
     public void setEndingTime(Date endingTime) {
-        this.endingTime = GeneralUtils.STICKY_DATE_FORMAT.format(endingTime);
+        DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        this.endingTime = dateFormat.format(endingTime);
     }
 
     public String getSessionName() {

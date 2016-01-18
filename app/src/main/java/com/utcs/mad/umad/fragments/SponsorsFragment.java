@@ -114,6 +114,7 @@ public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnR
                         Log.i(TAG, "done: " + companyInfo.getName() + " " + companyInfo.getLevel());
                     }
                     UserPrefStorage.setCompanyCache(getContext(), sponsors);
+                    updateViewData();
                     Log.i(TAG, "done: SPONSORS");
                 } else {
                     Log.e(TAG, "exception parse");
@@ -121,8 +122,6 @@ public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnR
                 refreshLayout.setRefreshing(false);
             }
         });
-
-        updateViewData();
     }
 
     private void addParseSponsorsToList(List<ParseObject> parseObjects) {
