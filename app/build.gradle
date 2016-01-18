@@ -42,9 +42,6 @@ android {
 
         buildConfigField "String", "TWITTER_KEY", "\"${retrieveProp('TWITTER_KEY')}\""
         buildConfigField "String", "TWITTER_SECRET", "\"${retrieveProp('TWITTER_SECRET')}\""
-        buildConfigField "String", "TWITTER_ACCESS_TOKEN", "\"${retrieveProp('TWITTER_ACCESS_TOKEN')}\""
-        buildConfigField "String", "TWITTER_ACCESS_TOKEN_SECRET", "\"${retrieveProp('TWITTER_ACCESS_TOKEN_SECRET')}\""
-        buildConfigField "String", "TWITTER_MAD_ID", "\"${retrieveProp('TWITTER_MAD_ID')}\""
     }
     buildTypes {
         release {

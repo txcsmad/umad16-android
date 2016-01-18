@@ -12,12 +12,13 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * CompanyInfo
  * This is a model to hold information for all of the company sponsors/entites that are in uMAD
  */
-public class CompanyInfo implements Parcelable {
+public class CompanyInfo implements Parcelable, Comparable<CompanyInfo> {
 
     private static final String TAG = "CompanyInfo";
 
@@ -81,7 +82,6 @@ public class CompanyInfo implements Parcelable {
     /*
      * PARCELABLE
      */
-
     @Override
     public int describeContents() {
         return 0;
@@ -115,4 +115,13 @@ public class CompanyInfo implements Parcelable {
             return new CompanyInfo[size];
         }
     };
+
+    /*
+     * COMPARATOR
+     */
+    @Override
+    public int compareTo(CompanyInfo another) {
+        Log.i(TAG, "compareTo: " + getName() + " " + getLevel() + " --- " + another.getName() + " " + another.getLevel());
+        return another.getLevel() - getLevel();
+    }
 }

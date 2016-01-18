@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.LoginFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -109,6 +110,9 @@ public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnR
             public void done(List<ParseObject> parseObjects, ParseException e) {
                 if( e == null) {
                     addParseSponsorsToList(parseObjects);
+                    for (CompanyInfo companyInfo : sponsors) {
+                        Log.i(TAG, "done: " + companyInfo.getName() + " " + companyInfo.getLevel());
+                    }
                     UserPrefStorage.setCompanyCache(getContext(), sponsors);
                     Log.i(TAG, "done: SPONSORS");
                 } else {
@@ -131,6 +135,7 @@ public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnR
                     String level = (String) sponsor.get("level");
                     CompanyInfo curSponsor = new CompanyInfo(curCompanyInfo, level);
                     sponsors.add(curSponsor);
+                    
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -140,15 +145,17 @@ public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void updateViewData() {
-        Collections.sort(sponsors, new Comparator<CompanyInfo>() {
-            @Override
-            public int compare(CompanyInfo  company1, CompanyInfo  company2)
-            {
-                if(company1.getLevel() < company2.getLevel()) return 1;
-                else if (company1.getLevel() > company2.getLevel()) return -1;
-                else return 0;
-            }
-        });
+        Log.i(TAG, "updateViewData: YOYOY");
+//        Collections.sort(sponsors, new Comparator<CompanyInfo>() {
+//            @Override
+//            public int compare(CompanyInfo  company1, CompanyInfo  company2)
+//            {
+//                if(company1.getLevel() < company2.getLevel()) return 1;
+//                else if (company1.getLevel() > company2.getLevel()) return -1;
+//                else return 0;
+//            }
+//        });
+        Collections.sort(sponsors);
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 

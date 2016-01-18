@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.utcs.mad.umad.utils.GeneralUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 /**
@@ -35,8 +37,11 @@ public class EventInfo implements Parcelable {
     public EventInfo(ParseObject parseEvent) {
         try {
             topics = new ArrayList<>();
-            for (Object wannaBeString : parseEvent.fetchIfNeeded().getList("topicTags")) {
-                topics.add((String) wannaBeString);
+            List<Object> parseList = parseEvent.fetchIfNeeded().getList("topicTags");
+            if (parseList != null) {
+                for (Object wannaBeString : parseEvent.fetchIfNeeded().getList("topicTags")) {
+                    topics.add((String) wannaBeString);
+                }
             }
             setStartingTime(parseEvent.getDate("startTime"));
             setEndingTime(parseEvent.getDate("endTime"));
@@ -108,9 +113,7 @@ public class EventInfo implements Parcelable {
     }
 
     public void setStartingTime(Date startingTime) {
-        DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        this.startingTime = dateFormat.format(startingTime);
+        this.startingTime = GeneralUtils.STICKY_DATE_FORMAT.format(startingTime);
     }
 
     public String getEndingTime() {
@@ -118,9 +121,7 @@ public class EventInfo implements Parcelable {
     }
 
     public void setEndingTime(Date endingTime) {
-        DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        this.endingTime = dateFormat.format(endingTime);
+        this.endingTime = GeneralUtils.STICKY_DATE_FORMAT.format(endingTime);
     }
 
     public String getSessionName() {

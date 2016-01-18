@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import com.parse.FindCallback;
@@ -59,6 +60,39 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private void setupStickyList(ViewGroup root) {
         stickyListView = (StickyListHeadersListView) root.findViewById(R.id.schedule_list);
+        refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipe_refresh);
+
+        ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
+        stickyListView.setAdapter(scheduleAdapter);
+
+        // The fix to get the SwipeRefreshLayout to work properly with a sectioned header
+        stickyListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                // The magic lays here. Get the listwrappers top point.
+                View childView = stickyListView.getWrappedList().getChildAt(0);
+                int top = (childView == null) ? 0 : childView.getTop();
+
+                // If at the absolute top then enable the SwipeRefreshLayout
+                if (top >= 0) {
+                    refreshLayout.setEnabled(true);
+                    Log.i(TAG, "onScroll: true");
+                } else {
+                    refreshLayout.setEnabled(false);
+                    Log.i(TAG, "onScroll: false");
+                }
+            }
+        });
+
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setRefreshing(true);
+
         stickyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -67,12 +101,6 @@ public class ScheduleFragment extends Fragment implements SwipeRefreshLayout.OnR
                 getActivity().startActivity(intent);
             }
         });
-        ScheduleAdapter scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), times, events);
-        stickyListView.setAdapter(scheduleAdapter);
-
-        refreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipe_refresh);
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setRefreshing(true);
     }
 
     private void getEventData(boolean forceGet) {

@@ -21,8 +21,10 @@ import com.utcs.mad.umad.activities.MainActivity;
 import com.utcs.mad.umad.models.CompanyInfo;
 import com.utcs.mad.umad.models.EventInfo;
 import com.utcs.mad.umad.models.Helper;
+import com.utcs.mad.umad.utils.GeneralUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
@@ -137,7 +139,13 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
 
     @Override
     public long getHeaderId(int position) {
-        return events.size();
+        Calendar cal = Calendar.getInstance();
+        try {
+            cal.setTime(GeneralUtils.STICKY_DATE_FORMAT.parse(events.get(position).getStartingTime()));
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        return cal.getTime().getHours();
     }
 
 }
