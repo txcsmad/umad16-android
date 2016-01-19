@@ -56,7 +56,7 @@ public class MainActivity extends ActionBarActivity{
         toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(" " + getString(R.string.app_name));
-        toolbar.setLogo(R.drawable.ic_laucher_white);
+        toolbar.setLogo(R.drawable.ic_launcher_white);
     }
 
     @Override

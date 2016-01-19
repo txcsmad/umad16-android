@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.parse.ParseUser;
 import com.utcs.mad.umad.activities.LoginActivity;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,6 +30,7 @@ public class GeneralUtils {
 
     public static void logout(Context context) {
         UserPrefStorage.setParseUserId(context, null);
+        new File(context.getFilesDir().getPath(), "qr.png").delete();
         ParseUser.logOut();
         Intent newIntent = new Intent(context, LoginActivity.class);
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
