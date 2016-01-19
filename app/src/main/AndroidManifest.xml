@@ -9,18 +9,24 @@
     <application
         android:name=".application.uMadApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_laucher_white"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.LoginActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activities.EventActivity"
@@ -36,7 +42,7 @@
             android:value="58820f249988257505397dedfcd05aba88ce9383" />
 
         <activity
-            android:name=".activities.AboutUsActivity"
+            android:name=".activities.ProfileActivity"
             android:label="@string/app_name"
             android:parentActivityName=".activities.MainActivity" >
             <meta-data

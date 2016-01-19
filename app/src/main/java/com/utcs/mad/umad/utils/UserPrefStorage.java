@@ -24,6 +24,16 @@ public class UserPrefStorage {
         return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    /* USER CACHE */
+
+    public static String getParseUserId(Context context) {
+        return getPrefs(context).getString("parse-user-id", null);
+    }
+
+    public static void setParseUserId(Context context, String parseUserId) {
+        getPrefs(context).edit().putString("parse-user-id", parseUserId).commit();
+    }
+
     /* SCHEDULE CACHE */
 
     public static Calendar getScheduleCacheDate(Context context) {

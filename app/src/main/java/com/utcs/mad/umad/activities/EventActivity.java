@@ -19,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.utcs.mad.umad.utils.GeneralUtils;
 import com.utcs.mad.umad.views.ScrollViewWithListener;
 import com.utcs.mad.umad.models.EventInfo;
 import com.utcs.mad.umad.models.Helper;
@@ -183,10 +184,13 @@ public class EventActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.about_us) {
-            Intent intent = new Intent(this, AboutUsActivity.class);
-            startActivity(intent);
-            return true;
+        switch (id) {
+            case R.id.logout:
+                GeneralUtils.logout(this);
+                return true;
+            case R.id.profile:
+                startActivity(new Intent(this, ProfileActivity.class));
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
