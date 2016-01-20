@@ -117,7 +117,7 @@ public class SponsorsFragment extends Fragment implements SwipeRefreshLayout.OnR
                     UserPrefStorage.setCompanyCache(getContext(), sponsors);
                     Log.i(TAG, "done: SPONSORS");
                 } else {
-                    Log.e(TAG, "exception parse");
+                    Log.e(TAG, e.getLocalizedMessage());
                 }
                 refreshLayout.setRefreshing(false);
             }

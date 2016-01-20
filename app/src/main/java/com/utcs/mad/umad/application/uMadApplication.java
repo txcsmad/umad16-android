@@ -20,7 +20,7 @@ public class uMadApplication extends Application {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, BuildConfig.PARSE_ID, BuildConfig.PARSE_CLIENT_KEY);
 
-        ParseUser.enableAutomaticUser();
+//        ParseUser.enableAutomaticUser();
         ParseACL defaultACL = new ParseACL();
 
         defaultACL.setPublicReadAccess(true);

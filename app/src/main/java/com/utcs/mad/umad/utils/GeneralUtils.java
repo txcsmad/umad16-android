@@ -2,6 +2,7 @@ package com.utcs.mad.umad.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.parse.ParseUser;
 import com.utcs.mad.umad.activities.LoginActivity;
@@ -16,6 +17,8 @@ import java.util.Locale;
  * Created by Drew on 1/17/16.
  */
 public class GeneralUtils {
+    private static final String TAG = "GeneralUtils";
+
     private static final String DEFAULT_DATE_FORMAT_STR = "yyyy-MM-dd'T'HH:mm:ssZ";
     private static final String STICKY_DATE_FORMAT_STR = "h:mm a";
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat(GeneralUtils.DEFAULT_DATE_FORMAT_STR, Locale.ENGLISH);
@@ -29,9 +32,13 @@ public class GeneralUtils {
     }
 
     public static void logout(Context context) {
-        UserPrefStorage.setParseUserId(context, null);
         new File(context.getFilesDir().getPath(), "qr.png").delete();
         ParseUser.logOut();
+        if (ParseUser.getCurrentUser() == null) {
+            Log.i(TAG, "logout: success");
+        } else {
+            Log.i(TAG, "logout: failure");
+        }
         Intent newIntent = new Intent(context, LoginActivity.class);
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(newIntent);

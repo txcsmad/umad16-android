@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.utcs.mad.umad.R;
 import com.utcs.mad.umad.utils.UserPrefStorage;
@@ -30,9 +32,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if(UserPrefStorage.getParseUserId(this) != null) {
-            parseLogin();
-        }
+        goToMain();
 
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
@@ -62,6 +62,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void goToMain() {
         if(ParseUser.getCurrentUser() != null) {
+//            ParseUser.getCurrentUser().pinInBackground();
+//            UserPrefStorage.setParseUserId(this, ParseUser.getCurrentUser().getObjectId());
             startActivity(new Intent(this, MainActivity.class));
         }
     }
