@@ -155,10 +155,14 @@ public class ProfileActivity extends AppCompatActivity {
                 findViewById(R.id.codeCard).setVisibility(View.GONE);
                 break;
             case "Waitlisted":
-                uMadStatus.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                uMadStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
                 findViewById(R.id.codeCard).setVisibility(View.GONE);
                 break;
             case "Accepted":
+                uMadStatus.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                findViewById(R.id.codeCard).setVisibility(View.GONE);
+                break;
+            case "Confirmed":
                 uMadStatus.setTextColor(getResources().getColor(android.R.color.holo_green_light));
                 if (!alreadyLoaded) {
                     alreadyLoaded = true;

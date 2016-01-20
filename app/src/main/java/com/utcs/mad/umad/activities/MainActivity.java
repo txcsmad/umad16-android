@@ -1,14 +1,19 @@
 package com.utcs.mad.umad.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -19,6 +24,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
+import com.parse.ParseRole;
 import com.parse.ParseUser;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.utcs.mad.umad.models.CompanyInfo;
@@ -99,35 +105,63 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(new Intent(this, ProfileActivity.class));
                 return true;
             case R.id.scan_qr:
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.CAMERA},
+                            GeneralUtils.CAMERA_PERMISSION_RESULT);
+                } else {
+                    startActivity(new Intent(this, VolunteerActivity.class));
+                }
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case GeneralUtils.CAMERA_PERMISSION_RESULT: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    startActivity(new Intent(this, VolunteerActivity.class));
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "This feature doesn't work without the camera permission", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+        }
+    }
+
     public void checkIfVolunteer() {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Role");
-        query.findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<ParseRole> query1 = ParseRole.getQuery();
+        query1.whereEqualTo("name", "UMAD Volunteer");
+        query1.whereEqualTo("users", ParseUser.getCurrentUser());
+
+        ParseQuery<ParseRole> query2 = ParseRole.getQuery();
+        query2.whereEqualTo("name", "Administrator");
+        query2.whereEqualTo("users", ParseUser.getCurrentUser());
+
+        ArrayList<ParseQuery<ParseRole>> queryList = new ArrayList<>();
+        queryList.add(query1);
+        queryList.add(query2);
+
+        ParseQuery<ParseRole> query = ParseQuery.or(queryList);
+        query.findInBackground(new FindCallback<ParseRole>() {
             @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (list == null) return;
-                for (ParseObject parseObjectRole : list) {
-                    ParseQuery<ParseObject> parseRelation = parseObjectRole.getRelation("users").getQuery();
-                    parseRelation.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> list, ParseException e) {
-                            if (list == null) return;
-                            for (ParseObject parseObjectUser : list) {
-                                try {
-                                    if (parseObjectUser.fetchIfNeeded().getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
-                                        updateMenuForVolunteer();
-                                    }
-                                } catch (ParseException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-                        }
-                    });
+            public void done(List<ParseRole> list, ParseException e) {
+                if (e == null) {
+                    if (list.size() > 0) {
+                        updateMenuForVolunteer();
+                    }
+                } else {
+                    e.printStackTrace();
                 }
             }
         });

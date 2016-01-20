@@ -19,6 +19,7 @@ import java.util.Locale;
 public class GeneralUtils {
     private static final String TAG = "GeneralUtils";
 
+    public static final int CAMERA_PERMISSION_RESULT = 1;
     private static final String DEFAULT_DATE_FORMAT_STR = "yyyy-MM-dd'T'HH:mm:ssZ";
     private static final String STICKY_DATE_FORMAT_STR = "h:mm a";
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat(GeneralUtils.DEFAULT_DATE_FORMAT_STR, Locale.ENGLISH);

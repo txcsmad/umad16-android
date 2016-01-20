@@ -58,6 +58,7 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
 
+    compile 'com.google.android.gms:play-services-vision:8.4.0'
     compile 'com.google.zxing:core:3.0.0'
     compile('com.twitter.sdk.android:twitter:1.11.0@aar') {
         transitive = true;
