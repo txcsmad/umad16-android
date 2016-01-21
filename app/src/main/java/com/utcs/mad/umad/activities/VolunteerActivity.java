@@ -193,6 +193,7 @@ public class VolunteerActivity extends AppCompatActivity {
                                     updateApplicationStatus(parseObject);
                                 }
                             });
+                            alertBuilder.show();
                         } catch (ParseException e1) {
                             e1.printStackTrace();
                         }
@@ -210,7 +211,7 @@ public class VolunteerActivity extends AppCompatActivity {
     private void updateApplicationStatus(ParseObject parseObjectUser) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Application");
         query.include("pointer_field");
-        query.whereEqualTo("user", parseObjectUser.getObjectId());
+        query.whereEqualTo("user", parseObjectUser);
         query.getFirstInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(ParseObject parseObject, ParseException e) {
@@ -224,6 +225,7 @@ public class VolunteerActivity extends AppCompatActivity {
                             if (e == null) {
                                 Calendar cal = Calendar.getInstance();
                                 parseObject.put("arrivedAt", cal.getTime());
+                                parseObject.saveEventually();
                                 Toast.makeText(VolunteerActivity.this, "Check-in confirmed!", Toast.LENGTH_SHORT).show();
                             } else {
                                 e.printStackTrace();
