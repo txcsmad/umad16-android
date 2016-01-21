@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -31,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setViewsVisibility(View.INVISIBLE);
 
         goToMain();
 
@@ -60,11 +62,66 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void setViewsVisibility(int visibility) {
+        findViewById(R.id.emailWrapper).setVisibility(visibility);
+        findViewById(R.id.passwordWrapper).setVisibility(visibility);
+        findViewById(R.id.login_button).setVisibility(visibility);
+    }
+
     private void goToMain() {
         if(ParseUser.getCurrentUser() != null) {
-//            ParseUser.getCurrentUser().pinInBackground();
-//            UserPrefStorage.setParseUserId(this, ParseUser.getCurrentUser().getObjectId());
-            startActivity(new Intent(this, MainActivity.class));
+            ifAcceptedAllowToMain();
+        } else {
+            setViewsVisibility(View.VISIBLE);
         }
+    }
+
+    private void ifAcceptedAllowToMain() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Application");
+        query.include("pointer_field");
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e == null) {
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("UMAD_Application_Status");
+                    query.include("pointer_field");
+                    query.whereEqualTo("application", parseObject);
+                    query.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject parseObject, ParseException e) {
+                            if (e == null) {
+                                try {
+                                    if(parseObject.fetchIfNeeded().getString("status").equals("Confirmed")) {
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    } else {
+                                        notAcceptedToMain("Your uMAD Application is pending!");
+                                    }
+                                } catch (ParseException e1) {
+                                    e1.printStackTrace();
+                                }
+                            } else {
+                                if (e.getCode() == 101) {
+                                    notAcceptedToMain("Login failed, you have no application for uMAD!");
+                                } else {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    if (e.getCode() == 101) {
+                        notAcceptedToMain("Login failed, you have no application for uMAD!");
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    private void notAcceptedToMain(String message) {
+        setViewsVisibility(View.VISIBLE);
+        Toast.makeText(this, "Login failed, you have no application for uMAD!", Toast.LENGTH_SHORT).show();
     }
 }
