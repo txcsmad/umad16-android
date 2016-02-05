@@ -1,7 +1,7 @@
 uMAD 2016 Android App
 ------
 
-Hosting a conference? We put together this app for our annual developer conference, [uMAD](http://umad.me), and it's simple to configure it for your event as well. Check it out on the [Play Store](https://play.google.com/store/apps/details?id=com.utcs.mad.umad).
+Hosting a conference? We put together this app for our annual developer conference, [uMAD](http://umad.me), and it's simple to configure it for your event as well. Check it out on the [Play Store](https://play.google.com/store/apps/details?id=com.mad.umad).
 
 * Built on [Parse](http://parse.com) (free up to 30 requests a second), so you can change information and times without resubmitting
 * Twitter stream from your organization
