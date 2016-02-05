@@ -62,11 +62,13 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
     private class ViewHolder {
         TextView text;
         TextView  sessionName;
+        TextView timeText;
         ImageView sponsorIcon;
         TextView roomInfo;
 
         private ViewHolder(View view) {
             text = (TextView) view.findViewById(R.id.text);
+            timeText = (TextView) view.findViewById(R.id.time_text);
             sessionName = (TextView) view.findViewById(R.id.subtitle_text);
             sponsorIcon = (ImageView) view.findViewById(R.id.sponsor_icon);
             roomInfo = (TextView) view.findViewById(R.id.roomInfo);
@@ -102,6 +104,7 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
 
         // Update view with event info
         holder.text.setText(event.getCompanyName());
+        holder.timeText.setText(event.getStartingTime() + " - " + event.getEndingTime());
         holder.sessionName.setText(event.getSessionName());
         holder.roomInfo.setText(event.getRoom());
 //        Log.i(TAG, "getView: " + event.getRoom());
@@ -151,7 +154,7 @@ public class ScheduleAdapter extends BaseAdapter implements StickyListHeadersAda
         } catch (java.text.ParseException e) {
             e.printStackTrace();
         }
-        return cal.getTime().getHours();
+        return cal.getTime().getHours() + cal.getTime().getMinutes();
     }
 
 }

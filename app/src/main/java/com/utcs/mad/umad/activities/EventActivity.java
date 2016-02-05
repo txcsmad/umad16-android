@@ -114,7 +114,7 @@ public class EventActivity extends ActionBarActivity {
         // Update event info
         description_TextView.setText(eventInfo.getDescription());
         eventItemSession.setText(eventInfo.getSessionName());
-        eventItemTime = (TextView) findViewById(R.id.eventTime);
+        eventItemTime.setText(eventInfo.getStartingTime() + " - " + eventInfo.getEndingTime());
         eventItemSpeakerName.setText(eventInfo.getSpeaker());
         eventItemRoom.setText(eventInfo.getRoom());
     }
